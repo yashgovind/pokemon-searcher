@@ -1,60 +1,67 @@
-import React, { useState, useEffect } from 'react'
-import "./index.css";
-import PokemonCard from './components/Card.jsx'
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-function App() {
+import PokemonCard from './components/Card.jsx';
 
-  const [pokemon, setPokemon] = useState([]);
+function App() {
+  const [pokemon, setPokemon] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
 
-
-  async function getPokemonData(url) {
+  const getPokemonData = async (url) => {
     try {
       const response = await axios.get(url);
-      const data = (response.data);
-      setPokemon([data]);
-
+      setPokemon(response.data);
     } catch (error) {
-      console.error(error.message, 'error found');
+      console.error('Error fetching Pokémon data:', error);
+    }
+  };
+  
+  const handleSubmit = () => {
+    if (searchTerm) {
+      getPokemonData(`https://pokeapi.co/api/v2/pokemon/${searchTerm.toLowerCase()}`);
     }
   }
 
   useEffect(() => {
-    if (searchTerm) {
-      getPokemonData(`https://pokeapi.co/api/v2/pokemon/${searchTerm.toLowerCase()}`)
-    }
-  }, [searchTerm])
-
+    handleSubmit();
+  }, []);
 
   return (
-    <div className="min-h-screen bg-slate-600 p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-white">
+    <div className="min-h-screen bg-slate-600 p-6 flex flex-col items-center">
+      <form
+        className="flex items-center space-x-2 bg-white rounded-lg shadow-md p-2 max-w-md w-full mb-6"
+        onSubmit={(e) => {
+          e.preventDefault();
 
-      <form className="flex items-center space-x-2" onSubmit={(e) => {
-        e.preventDefault();
-        if (searchTerm) {
-          getPokemonData('https://pokeapi.co/api/v2/pokemon/${searchTerm.toLowerCase()}')
-        }
-     }}>
-  <input
-    type="text"
+        }}
+      >
+        <input
+          type="text"
           value={searchTerm}
-          onChange={(e)=>setSearchTerm(e.target.value)}
-    placeholder="Enter Pokémon name"
-    className="flex-grow p-2 rounded-lg border text-center border-gray-300 focus:outline-none"
-  />
-</form>
-      {pokemon.map((p) => (
-        <PokemonCard
-          key={p.id}
-          id={p.id}
-          name={p.name}
-          imageUrl={p.sprites.front_default}
-          types={p.types.map((t) => t.type.name)}
-          stats={p.stats}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Enter Pokémon name"
+          className="flex-grow p-2 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-      ))}
+        <button
+          type="submit"
+          className="px-4 py-2 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600 transition"
+          onClick={()=>handleSubmit()}
+        >
+          Search
+        </button>
+      </form>
+
+      {pokemon && (
+        <PokemonCard
+          key={pokemon.id}
+          id={pokemon.id}
+          name={pokemon.name}
+          imageUrl={pokemon.sprites.front_default}
+          types={pokemon.types.map((t) => t.type.name)}
+          stats={pokemon.stats}
+        />
+      )}
     </div>
   );
 }
 
-export default App
+export default App;
