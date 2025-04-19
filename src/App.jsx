@@ -9,8 +9,8 @@ function App() {
   const [errorMSg, setErrorMsg] = useState("");
   const [loader, setLoader] = useState(false);
 
-  const getPokemonData = async (url) => {
 
+  const getPokemonData = async (url) => {
     try {
       const response = await axios.get(url);
       setPokemon(response.data);
@@ -19,9 +19,6 @@ function App() {
       console.error("Error fetching Pokémon data:", error);
       setPokemon(null);
       setErrorMsg('No Pokémon Found');
-    }
-    finally {
-      setLoader(false);
     }
   };
 
