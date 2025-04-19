@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import PokemonCard from "./components/Card.jsx";
+import Loader from "./components/Loader.jsx";
 
 function App() {
   const [pokemon, setPokemon] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [errorMSg, setErrorMsg] = useState("");
+  const [loader, setLoader] = useState(false);
 
   const getPokemonData = async (url) => {
+    // setErrorMsg("");
+    // setPokemon(null);
+    // setLoader(true);
     try {
       const response = await axios.get(url);
       setPokemon(response.data);
@@ -17,14 +22,21 @@ function App() {
       setPokemon(null);
       setErrorMsg('No Pokémon Found');
     }
+    finally {
+      setLoader(false);
+    }
   };
 
   const handleSubmit = () => {
-    if (searchTerm) {
-      getPokemonData(
-        `https://pokeapi.co/api/v2/pokemon/${searchTerm.toLowerCase()}`
-      );
-    }
+    if (!searchTerm) return;
+    setLoader(true);
+    setPokemon(null);
+    setErrorMsg("");
+    setTimeout(() => {
+        getPokemonData(
+          `https://pokeapi.co/api/v2/pokemon/${searchTerm.toLowerCase()}`
+        );
+      }, 5000);
   };
 
   useEffect(() => {
@@ -37,8 +49,7 @@ function App() {
         className="flex items-center space-x-2 bg-white rounded-lg shadow-md p-2 max-w-md w-full mb-6"
         onSubmit={(e) => {
           e.preventDefault();
-          setPokemon(null);
-          setErrorMsg('');
+          handleSubmit();
         }}
       >
         <input
@@ -51,18 +62,22 @@ function App() {
         <button
           type="submit"
           className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-600 transition"
-          onClick={() => handleSubmit()}
+
           >
           Search
         </button>
       </form>
+
+      {loader && (
+        <Loader />
+       )}
           {errorMSg && (
             <div className="text-red-400 text-8xl font-semibold mb-4">
               {errorMSg}
             </div>
           )}
 
-      {pokemon && (
+      {pokemon && !loader &&(
         <PokemonCard
           key={pokemon.id}
           id={pokemon.id}
