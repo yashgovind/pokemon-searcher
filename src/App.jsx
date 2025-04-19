@@ -10,9 +10,7 @@ function App() {
   const [loader, setLoader] = useState(false);
 
   const getPokemonData = async (url) => {
-    // setErrorMsg("");
-    // setPokemon(null);
-    // setLoader(true);
+
     try {
       const response = await axios.get(url);
       setPokemon(response.data);
@@ -36,7 +34,7 @@ function App() {
         getPokemonData(
           `https://pokeapi.co/api/v2/pokemon/${searchTerm.toLowerCase()}`
         );
-      }, 5000);
+      }, 2500);
   };
 
   useEffect(() => {
